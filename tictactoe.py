@@ -1,3 +1,5 @@
+from random import random
+
 EMPTY = ' '
 X = 'X'
 O = 'O'
@@ -10,6 +12,7 @@ PLAYERS = (X, O)
 def getEmptyBoard():
  return EMPTY * 9
 
+
 # validGame(str[9], (char, char))
 # returns -> bool
 # Returns wheter the game of tic tac toe
@@ -21,6 +24,7 @@ def getEmptyBoard():
 def validGame(piece, players):
  diff = piece.count(players[0]) - piece.count(players[1])
  return diff == 0 or diff == 1
+
 
 # win(char, str[9])
 # returns -> bool
@@ -89,19 +93,19 @@ def countPossibleWins(piece, player, players, setBoards = set({}), i = -1):
  
  return count
 
-
+# TODO test
 # getWinCounts(str[9], (char, char))
 # returns -> int[9]
 # Returns an array of all possible win counts
 #  for the next playing player
-def getWinCounts(piece, players):
+def getWinCounts(piece, players, player = -1):
  winCounts = [-1] * 9
 
  availablePlays = piece.count(EMPTY) # how many possible plays
  if availablePlays == 0: # if the game is over
   return winCounts
- 
- player = (availablePlays - 1) % 2 # determine the 
+ if player == -1:
+  player = (availablePlays - 1) % 2 # determine the next player
  for play in range(availablePlays): # for all available plays
   index = permutation(play,piece)
   # get the play
@@ -112,9 +116,27 @@ def getWinCounts(piece, players):
  
  return winCounts
 
-# cpuMove(str[9], int, (char, char), int)
+# TODO test
+# cpuMove(str[9], (char, char), int)
 # returns -> str[9]
 # Returns a piece with a cpu making the
-#  next move
+#  next move with varying difficulty
 def cpuMove(piece, players, level):
- pass # TODO
+ player = (piece.count(EMPTY) - 1) % 2 
+ winCounts = getWinCounts(piece, players, player)
+ moves = []
+ if level == 3: # optimal play
+  moves = [i for i, wins in enumerate(winCounts) if wins == max(winCounts)]
+ 
+ elif level == 2: # semi optimal play
+  allWins = [win for win in winCounts if win != -1] # possible plays
+  avg = int(sum(allWins) / len(allWins)) # average of all win counts
+  # all plays with a win count above average
+  moves = [i for i, win in enumerate(winCounts) if win >= avg]
+ 
+ elif level == 1: # random play
+  moves = [i for i,char in enumerate(piece) if char == EMPTY]
+ else : # level invalid
+  return piece
+
+ return playOnPiece(piece, players[player], moves[int(random() * len(moves))])

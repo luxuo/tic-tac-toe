@@ -35,8 +35,9 @@ gameState = 2
 player = False
 while gameState == 2:
  oldPiece = piece
- piece = move(piece, int(input()), ttt.PLAYERS[player])
- player = not player if oldPiece != piece else player
+ piece = move(piece, ttt.PLAYERS[player], int(input()))
+ # should be cpu
+ piece = ttt.cpuMove(piece,ttt.PLAYERS,1)
  printBoard(piece)
  gameState = gameOver(piece, ttt.PLAYERS)
 
